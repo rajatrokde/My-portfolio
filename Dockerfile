@@ -5,7 +5,7 @@ FROM nginx:latest
 COPY . /usr/share/nginx/html
 
 # Expose the port that the website will be running on
-EXPOSE 80
+EXPOSE 81
 
 # Set the command to start the web server
 CMD ["nginx", "-g", "daemon off;"]
