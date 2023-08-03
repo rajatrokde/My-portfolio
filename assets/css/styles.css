@@ -436,8 +436,8 @@ work__container bd-grid{
     margin-right: var(--mb-4);
   }
   .home__img {
-    width: 300px;
-    bottom: 25%;
+    width: 0px;
+    bottom: 0%;
   }
   .about__container {
     grid-template-columns: repeat(2, 1fr);
