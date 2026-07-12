@@ -18,7 +18,7 @@ pipeline {
         stage("Deploy"){
             steps {
                 echo "Deploying the container"
-                sh "docker-compose down && docker-compose up -d"
+                sh "docker run -it -p 80:80 demoportfolio:v1 "
                 
             }
         }
