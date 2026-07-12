@@ -18,7 +18,7 @@ pipeline {
         stage("Deploy"){
             steps {
                 echo "Deploying the container"
-                sh "docker run -it -p 80:80 demoportfolio:v1 "
+                sh "docker run -p 80:80 demoportfolio:v1 "
                 
             }
         }
