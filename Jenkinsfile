@@ -12,7 +12,7 @@ pipeline {
         stage("Build"){
             steps {
                 echo "Building the image"
-                sh "docker build -t demoportfolio ." 
+                sh "docker build -t demoportfolio:v1 ." 
             }
         }
         stage("Deploy"){
