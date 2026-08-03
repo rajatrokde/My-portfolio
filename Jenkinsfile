@@ -12,13 +12,13 @@ pipeline {
         stage("Build"){
             steps {
                 echo "Building the image"
-                sh "docker build -t demoportfolio:v1 ." 
+                sh "docker build -t portfolio:v1 ." 
             }
         }
         stage("Deploy"){
             steps {
                 echo "Deploying the container"
-                sh "docker run -p 80:80 demoportfolio:v1 "
+                sh "docker run -p 80:80 portfolio:v1 "
                 
             }
         }
@@ -29,7 +29,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: "dockerHub", passwordVariable: "dockerHubPass", usernameVariable: "dockerHubUser")]) {
                     sh "docker tag demoportfolio ${env.dockerHubUser}/demoportfolio:v1"
                     sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                    sh "docker push ${env.dockerHubUser}/demoportfolio:v1"
+                    sh "docker push ${env.dockerHubUser}/portfolio:v1"
                     
                 }
             }
