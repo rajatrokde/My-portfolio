@@ -7,43 +7,51 @@ jobs:
   build:
     docker:
       - image: cimg/base:stable
+
     steps:
       - checkout
 
-      # Install Node (only needed if you want minification or build scripts)
       - run:
-          name: Install Node.js
+          name: Check Website Files
           command: |
-            sudo apt update
-            sudo apt install -y nodejs npm
+            echo "Checking website files..."
+            ls -la
+
+            if [ ! -f index.html ]; then
+              echo "ERROR: index.html not found!"
+              exit 1
+            fi
+
+            echo "index.html found successfully."
+
+  deploy:
+    docker:
+      - image: cimg/base:stable
+
+    steps:
+      - checkout
 
       - run:
-          name: Install dependencies if package.json exists (optional)
+          name: Verify Website
           command: |
-            if [ -f package.json ]; then npm install; fi
+            if [ ! -f index.html ]; then
+              echo "ERROR: index.html not found!"
+              exit 1
+            fi
 
-      - run:
-          name: Build website (optional)
-          command: |
-            if [ -f package.json ]; then npm run build || true; fi
+            echo "Website is ready for deployment."
 
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
+      - gh-pages/deploy:
+          repo: << pipeline.project.git_url >>
+          ssh-fingerprint: "<<SSH-FINGERPRINT>>"
+          source: "."
+          branch: "gh-pages"
 
 workflows:
   deploy_website:
     jobs:
       - build
 
-      - gh-pages/deploy:
+      - deploy:
           requires:
             - build
-          repo: << pipeline.project.git_url >>
-          ssh-fingerprint: "<<SSH-FINGERPRINT>>"
-          # Folder that contains final HTML/CSS/JS files
-          source: "."
-
-          # Target branch
-          branch: "gh-pages"
