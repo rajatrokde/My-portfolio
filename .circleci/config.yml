@@ -1,0 +1,44 @@
+version: 2.1
+
+jobs:
+  build-and-deploy:
+    docker:
+      - image: cimg/base:stable
+
+    steps:
+      - checkout
+
+      - run:
+          name: Verify Website
+          command: |
+            echo "Checking website files..."
+            ls -la
+
+            if [ ! -f index.html ]; then
+              echo "ERROR: index.html not found!"
+              exit 1
+            fi
+
+            echo "Website files found successfully."
+
+      - run:
+          name: Deploy to GitHub Pages
+          command: |
+            git config user.name "CircleCI"
+            git config user.email "circleci@users.noreply.github.com"
+
+            git checkout --orphan gh-pages
+
+            git rm -rf . || true
+
+            git checkout "$CIRCLE_BRANCH" -- .
+
+            git add .
+            git commit -m "Deploy website from CircleCI" || true
+
+            git push -f origin gh-pages
+
+workflows:
+  deploy:
+    jobs:
+      - build-and-deploy
