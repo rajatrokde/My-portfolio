@@ -1,30 +1,7 @@
 version: 2.1
 
-orbs:
-  gh-pages: circleci/gh-pages@1.8.0
-
 jobs:
-  build:
-    docker:
-      - image: cimg/base:stable
-
-    steps:
-      - checkout
-
-      - run:
-          name: Check Website Files
-          command: |
-            echo "Checking website files..."
-            ls -la
-
-            if [ ! -f index.html ]; then
-              echo "ERROR: index.html not found!"
-              exit 1
-            fi
-
-            echo "index.html found successfully."
-
-  deploy:
+  build-and-deploy:
     docker:
       - image: cimg/base:stable
 
@@ -34,24 +11,34 @@ jobs:
       - run:
           name: Verify Website
           command: |
+            echo "Checking website files..."
+            ls -la
+
             if [ ! -f index.html ]; then
               echo "ERROR: index.html not found!"
               exit 1
             fi
 
-            echo "Website is ready for deployment."
+            echo "Website files found successfully."
 
-      - gh-pages/deploy:
-          repo: << pipeline.project.git_url >>
-          ssh-fingerprint: "<<SSH-FINGERPRINT>>"
-          source: "."
-          branch: "gh-pages"
+      - run:
+          name: Deploy to GitHub Pages
+          command: |
+            git config user.name "CircleCI"
+            git config user.email "circleci@users.noreply.github.com"
+
+            git checkout --orphan gh-pages
+
+            git rm -rf . || true
+
+            git checkout "$CIRCLE_BRANCH" -- .
+
+            git add .
+            git commit -m "Deploy website from CircleCI" || true
+
+            git push -f origin gh-pages
 
 workflows:
-  deploy_website:
+  deploy:
     jobs:
-      - build
-
-      - deploy:
-          requires:
-            - build
+      - build-and-deploy
